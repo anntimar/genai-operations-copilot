@@ -5,7 +5,11 @@ from app.models import Base
 
 def migrate():
     with engine.connect() as connection:
-        context.configure(connection=connection, target_metadata=Base.metadata)
+        context.configure(
+            connection=connection,
+            target_metadata=Base.metadata,
+            version_table_schema=context.config.attributes.get("version_table_schema"),
+        )
         with context.begin_transaction():
             context.run_migrations()
 

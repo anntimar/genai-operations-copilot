@@ -4,7 +4,7 @@ from uuid import uuid4
 import pytest
 from alembic.config import Config
 from fastapi.testclient import TestClient
-from sqlalchemy import text
+from sqlalchemy import event, text
 from sqlalchemy.orm import Session
 
 from alembic import command
@@ -27,14 +27,19 @@ def client(tmp_path, monkeypatch):
         with admin.begin() as connection:
             connection.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
             connection.execute(text(f"CREATE SCHEMA {schema}"))
-        engine = core.make_engine(
-            url, connect_args={"options": f"-csearch_path={schema},public"}
-        )
+        engine = core.make_engine(url)
+
+        @event.listens_for(engine, "checkout")
+        def set_search_path(connection, _record, _proxy):
+            connection.execute(f"SET search_path TO {schema}, public")
+            connection.commit()
     else:
         engine = core.make_engine(url)
     monkeypatch.setattr(core, "engine", engine)
     monkeypatch.setattr(core.settings, "approval_key", "test-reviewer")
     config = Config("alembic.ini")
+    if admin:
+        config.attributes["version_table_schema"] = schema
     command.upgrade(config, "head")
 
     def override():

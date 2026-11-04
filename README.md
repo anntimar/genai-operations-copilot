@@ -95,6 +95,8 @@ Execução HTTP local com FastAPI, SQLite e modo mock. O [relatório por caso](d
 
 Na suíte local com SQLite, 15 testes passaram com 87% de cobertura de código. Ruff e mypy passaram. A interface foi exercitada contra a API local com consulta, citação, histórico e feedback.
 
+No Docker Compose, com PostgreSQL 16.15 e pgvector 0.8.6, a avaliação em modo mock registrou 100% de hit rate@5 e Recall@5, 28/28 respostas esperadas com citação, 2/2 casos de abstenção e injeção e custo estimado de US$ 0,00. A latência média foi de 8,19 ms e o p95 foi de 16,96 ms. Veja o [relatório do Compose](docs/evaluation-postgres16-mock.json).
+
 A avaliação usa procedimentos sintéticos e perguntas curtas. Ela cobre regressões do modo mock e não mede a qualidade de um provedor generativo ou de um modelo semântico externo.
 
 ## English summary
